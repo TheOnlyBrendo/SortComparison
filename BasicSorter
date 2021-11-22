@@ -1,0 +1,156 @@
+package sortcomparison;
+
+import java.util.*;
+
+public class BasicSorter implements Sorter {
+
+	@Override
+	public void insertionSort(String[] data, int fi, int n) {
+		// String[] temp = new String[5];
+
+		for (int i = fi; i < fi + n; i++) {
+			var key = data[i];
+			int j = i - 1;
+			// Move elements of data, that are greater than key,
+			// to one position ahead of their current position
+
+			while (j >= fi && data[j].compareTo(key) > 0) {
+				data[j + 1] = data[j];
+				j = j - 1;
+			}
+			data[j + 1] = key;
+		}
+
+	}
+
+
+	@Override
+	public void quickSort(String[] data, int fi, int n) {
+		if (n < 16) {
+			insertionSort(data, fi, n);
+		} else {
+			int mid = partition(data, fi, n);
+			quickSort(data, fi, mid - fi);
+			quickSort(data, mid, fi + n - mid);
+
+		}
+
+	}
+
+
+	private void swap(String[] data, int ndx, int ndx2) {
+		var temp = data[ndx];
+		data[ndx] = data[ndx2];
+		data[ndx2] = temp;
+	}
+
+
+	public static int medianPivot(String[] data, int fi, int n) {
+		/*
+		 * create subarray with low, high, and middle elements in the array sort the
+		 * subarray and use index 1 as the median of 3
+		 */
+
+		int low = fi;
+		int mid = fi + n / 2;
+		int high = (fi + n - 1);
+
+		// Checking for mid
+		if ((data[low].compareTo(data[mid]) < 0 && data[mid].compareTo(data[high]) < 0)
+				|| (data[high].compareTo(data[mid]) < 0 && data[mid].compareTo(data[low]) < 0))
+			return mid;
+
+		// Checking for low
+		else if ((data[mid].compareTo(data[low]) < 0 && data[low].compareTo(data[high]) < 0)
+				|| (data[high].compareTo(data[low]) < 0 && data[low].compareTo(data[mid]) < 0))
+			return low;
+
+		else
+			return high;
+
+	}
+
+
+	@Override
+	public int partition(String[] data, int fi, int n) {
+		var pivotNdx = medianPivot(data, fi, n);
+		swap(data, fi, pivotNdx);
+		var pivot = data[fi];
+
+		var tbi = fi + 1;
+		var tsi = fi + n - 1;
+		while (tbi < tsi) {
+			while (tbi < tsi && data[tbi].compareTo(pivot) <= 0) {
+				tbi++;
+			}
+			while (tsi > fi && data[tsi].compareTo(pivot) > 0) {
+				tsi--;
+			}
+			if (tbi < tsi) {
+				swap(data, tbi, tsi);
+			}
+		}
+		if (pivot.compareTo(data[tsi]) >= 0) {
+			swap(data, fi, tsi);
+			return tsi;
+		} else
+			return fi;
+
+	}
+
+
+	@Override
+	public void mergeSort(String[] data, int fi, int n) {
+		int mid = n / 2;
+
+		if (n < 16) {
+			insertionSort(data, fi, n);
+		} else {
+			mergeSort(data, fi, mid); // left
+			mergeSort(data, fi + mid, n - mid); // right
+			merge(data, fi, mid, n - mid);
+		}
+	}
+
+
+	@Override
+	public void merge(String[] data, int fi, int nl, int nr) {
+		int n1 = nl;
+		int n2 = nr;
+
+		// temp arrays
+		String L[] = new String[n1 + 1];
+		String R[] = new String[n2 + 1];
+
+		// copy data into temp arrays
+		for (int i = 0; i < n1; ++i)
+			L[i] = data[fi + i];
+		for (int j = 0; j < n2; ++j)
+			R[j] = data[fi + nl + j];
+
+		// Merge the temp arrays
+
+		// Initial indexes of first and second subarrays
+		int i = 0, j = 0;
+
+		// Initial index of merged subarray array
+		int k = fi;
+		while (i < n1 && j < n2) {
+			if (L[i].compareTo(R[j]) <= 0) {
+				data[k] = L[i];
+				i++;
+			} else {
+				data[k] = R[j];
+				j++;
+			}
+			k++;
+		}
+
+		/* Copy remaining elements of L[] if any */
+
+		System.arraycopy(L, i, data, k, n1 - i);
+
+		/* Copy remaining elements of R[] if any */
+		System.arraycopy(R, j, data, k, n2 - j);
+	}
+}
